@@ -50,10 +50,10 @@ public class MyAppJobConfig {
     // WRITER
     @Bean
     public FlatFileItemWriter<String> writer(){
-
+        String date = getFormatedDate();
         return new FlatFileItemWriterBuilder<String>()
                 .name("ItemWriter")
-                .resource(new FileSystemResource("src/main/resources/output/Out.csv"))
+                .resource(new FileSystemResource("src/main/resources/output/Out_" + date + ".csv"))
                 .lineAggregator(new PassThroughLineAggregator<>())
                 .build();
     }
