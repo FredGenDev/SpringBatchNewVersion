@@ -13,6 +13,9 @@ spring:
 
   batch:
     initialize-schema: always
+    jdbc :
+      initialize-schema: always
 
 #  spring.jpa.properties.hibernate.show_sql=true
 #spring.jpa.properties.hibernate.format_sql=true
+# spring.batch.jdbc.initialize-schema=always

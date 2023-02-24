@@ -23,9 +23,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 @Configuration
-@EnableBatchProcessing
+//@EnableBatchProcessing
 public class MyAppJobConfig {
     @Autowired
     MyAppRepository myAppRepository;
@@ -41,7 +45,7 @@ public class MyAppJobConfig {
 
     @Bean
     public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("StepName", jobRepository)
+        return new StepBuilder("StepName2", jobRepository)
                 .<MyAppItem,String>chunk(10,transactionManager)
                 .reader(reader())
                 .processor(processor())
@@ -49,8 +53,13 @@ public class MyAppJobConfig {
                 .build();
     }
 
+    public ItemReader<MyAppItem> reader(){
+        return new MyItemReader();
+    }
+
     @Bean
     public FlatFileItemWriter<Object> writer() {
+        System.out.println("Writer");
         return new FlatFileItemWriterBuilder<>()
                 .name("ItemWriter")
                 .resource(new FileSystemResource("src/main/resources/output/Out.csv"))
@@ -64,19 +73,19 @@ public class MyAppJobConfig {
     }
 
     // READER
-    @Bean
-    public ItemReader<MyAppItem> reader(){
-        return new JdbcCursorItemReaderBuilder<MyAppItem>()
-                .name("cursorItemReader")
-                .dataSource(dataSource)
-                .sql("SELECT * FROM MY_APP_ITEM ORDER BY ID;")
-                .rowMapper(new BeanPropertyRowMapper<>(MyAppItem.class))
-                .build();
-    }
+//    @Bean
+//    public ItemReader<MyAppItem> reader(){
+//        return new JdbcCursorItemReaderBuilder<MyAppItem>()
+//                .name("cursorItemReader")
+//                .dataSource(dataSource)
+//                .sql("SELECT * FROM MY_APP_ITEM ORDER BY ID;")
+//                .rowMapper(new BeanPropertyRowMapper<>(MyAppItem.class))
+//                .build();
+//    }
 
     @Bean
     public Job runJob() {
-        return new JobBuilder("MSTabcNEUser", jobRepository)
+        return new JobBuilder("MyAppJob2", jobRepository)
                 .start(step1(jobRepository,transactionManager))
                 .build();
     }
