@@ -28,15 +28,13 @@ public class MyAppJobConfig {
     @Autowired
     DataSource dataSource;
 
-
-
     // READER - Lecture des données de la base aquagestback
     @Bean
     public ItemReader<MyAppItem> reader(){
         return new JdbcCursorItemReaderBuilder<MyAppItem>()
                 .name("cursorItemReader")
                 .dataSource(dataSource)
-                .sql("SELECT * FROM my_app_item")
+                .sql("SELECT * FROM MY_APP_ITEM ORDER BY ID;")
                 .rowMapper(new BeanPropertyRowMapper<>(MyAppItem.class))
                 .build();
     }

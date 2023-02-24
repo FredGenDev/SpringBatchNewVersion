@@ -7,6 +7,9 @@ public class MyAppItemProcessor implements ItemProcessor<MyAppItem,String> {
 
     @Override
     public String process(MyAppItem item) throws Exception {
-        return "In the processor...";
+        Long multiplication = item.getValueLong1() * item.getValueLong2();
+        StringBuilder strOut = new StringBuilder();
+        strOut.append(item.getName().toUpperCase()).append(";").append(item.getValueStr().toUpperCase()).append(";").append(multiplication) ;
+        return strOut.toString();
     }
 }
