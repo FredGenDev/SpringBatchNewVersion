@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/springbatchnewversion
+    password: postgresql
+    username: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto : update
