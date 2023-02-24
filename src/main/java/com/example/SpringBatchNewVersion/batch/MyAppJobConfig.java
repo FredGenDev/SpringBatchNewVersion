@@ -18,6 +18,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import javax.sql.DataSource;
+import java.util.Date;
 
 @Configuration
 public class MyAppJobConfig {
@@ -59,8 +60,9 @@ public class MyAppJobConfig {
     // STEP
     @Bean
     public Step JobStep(StepBuilderFactory stepBuilderFactory){
+        Date date = new Date();
         return stepBuilderFactory
-                .get("fishJobStep")
+                .get("fishJobStep"+date.toString())
                 .<MyAppItem,String>chunk(10)
                 .reader(reader())
                 .processor(processor())
