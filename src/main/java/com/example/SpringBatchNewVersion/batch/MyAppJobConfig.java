@@ -18,6 +18,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import javax.sql.DataSource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Configuration
@@ -48,9 +50,10 @@ public class MyAppJobConfig {
     // WRITER
     @Bean
     public FlatFileItemWriter<String> writer(){
+        String date = getFormatedDate();
         return new FlatFileItemWriterBuilder<String>()
                 .name("ItemWriter")
-                .resource(new FileSystemResource("src/main/resources/output/Out.csv"))
+                .resource(new FileSystemResource("src/main/resources/output/Out_"+date+".csv"))
                 .lineAggregator(new PassThroughLineAggregator<>())
                 .build();
     }
@@ -58,7 +61,7 @@ public class MyAppJobConfig {
     // STEP
     @Bean
     public Step JobStep(StepBuilderFactory stepBuilderFactory){
-        Date date = new Date();
+        String date = getFormatedDate();
         return stepBuilderFactory
                 .get("fishJobStep"+date.toString())
                 .<MyAppItem,String>chunk(10)
@@ -74,5 +77,10 @@ public class MyAppJobConfig {
         return jobBuilderFactory.get("MyAppJob")
                 .start(JobStep(stepBuilderFactory))
                 .build();
+    }
+
+    String getFormatedDate(){
+        LocalDateTime ldt = LocalDateTime.now();
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy-hhmmss").format(ldt);
     }
 }
