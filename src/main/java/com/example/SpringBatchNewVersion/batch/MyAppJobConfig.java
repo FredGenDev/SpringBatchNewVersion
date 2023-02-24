@@ -33,10 +33,51 @@ public class MyAppJobConfig {
     @Autowired
     DataSource dataSource;
 
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
     @Bean
-    public Job myJob(JobRepository jobRepository, Step step) {
-        return new JobBuilder("myJob", jobRepository)
-                .start(step)
+    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("StepName", jobRepository)
+                .<MyAppItem,String>chunk(10,transactionManager)
+                .reader(reader())
+                .processor(processor())
+                .writer(writer())
+                .build();
+    }
+
+    @Bean
+    public FlatFileItemWriter<Object> writer() {
+        return new FlatFileItemWriterBuilder<>()
+                .name("ItemWriter")
+                .resource(new FileSystemResource("src/main/resources/output/Out.csv"))
+                .lineAggregator(new PassThroughLineAggregator<>())
+                .build();
+    }
+
+    @Bean
+    public ItemProcessor<MyAppItem, String> processor(){
+        return new MyAppItemProcessor();
+    }
+
+    // READER
+    @Bean
+    public ItemReader<MyAppItem> reader(){
+        return new JdbcCursorItemReaderBuilder<MyAppItem>()
+                .name("cursorItemReader")
+                .dataSource(dataSource)
+                .sql("SELECT * FROM MY_APP_ITEM ORDER BY ID;")
+                .rowMapper(new BeanPropertyRowMapper<>(MyAppItem.class))
+                .build();
+    }
+
+    @Bean
+    public Job runJob() {
+        return new JobBuilder("MSTabcNEUser", jobRepository)
+                .start(step1(jobRepository,transactionManager))
                 .build();
     }
 
