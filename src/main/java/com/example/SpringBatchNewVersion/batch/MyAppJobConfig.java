@@ -4,11 +4,11 @@ import com.example.SpringBatchNewVersion.data.MyAppItem;
 import com.example.SpringBatchNewVersion.repo.MyAppRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.*;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
@@ -23,13 +23,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 @Configuration
-//@EnableBatchProcessing
 public class MyAppJobConfig {
     @Autowired
     MyAppRepository myAppRepository;
@@ -44,6 +40,14 @@ public class MyAppJobConfig {
     private PlatformTransactionManager transactionManager;
 
     private String jobName = "MyJob" + getFormatedDate();
+
+    // TASKLET
+    @Bean
+    public Step step0(JobRepository jobRepository, PlatformTransactionManager transactionManager){
+        return new StepBuilder("StepTaslLet", jobRepository)
+                .tasklet(new FileDeletingTasklet(new FileSystemResource("src/main/resources/")),transactionManager)
+                .build();
+    }
 
     // STEP
     @Bean
@@ -88,7 +92,8 @@ public class MyAppJobConfig {
     @Bean
     public Job runJob() {
         return new JobBuilder(this.jobName, jobRepository)
-                .start(step1(jobRepository,transactionManager))
+                .start(step0(jobRepository,transactionManager))
+                .next(step1(jobRepository,transactionManager))
                 .build();
     }
 
@@ -97,4 +102,3 @@ public class MyAppJobConfig {
         return DateTimeFormatter.ofPattern("MM-dd-yyyy_hhmmss").format(ldt);
     }
 }
-
