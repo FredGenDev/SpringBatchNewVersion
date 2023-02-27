@@ -85,7 +85,7 @@ public class MyAppJobConfig {
 
     @Bean
     public Job runJob() {
-        return new JobBuilder("MyAppJob2", jobRepository)
+        return new JobBuilder("MyAppJob"+getFormatedDate(), jobRepository)
                 .start(step1(jobRepository,transactionManager))
                 .build();
     }
