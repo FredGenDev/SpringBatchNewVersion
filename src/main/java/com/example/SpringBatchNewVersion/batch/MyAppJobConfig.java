@@ -43,6 +43,8 @@ public class MyAppJobConfig {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
+    private String jobName = "MyJob" + getFormatedDate();
+
     @Bean
     public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("StepName2", jobRepository)
@@ -62,7 +64,7 @@ public class MyAppJobConfig {
         System.out.println("Writer");
         return new FlatFileItemWriterBuilder<>()
                 .name("ItemWriter")
-                .resource(new FileSystemResource("src/main/resources/output/Out.csv"))
+                .resource(new FileSystemResource("src/main/resources/output/Out_" + this.jobName + ".csv"))
                 .lineAggregator(new PassThroughLineAggregator<>())
                 .build();
     }
@@ -85,7 +87,7 @@ public class MyAppJobConfig {
 
     @Bean
     public Job runJob() {
-        return new JobBuilder("MyAppJob"+getFormatedDate(), jobRepository)
+        return new JobBuilder(this.jobName, jobRepository)
                 .start(step1(jobRepository,transactionManager))
                 .build();
     }
