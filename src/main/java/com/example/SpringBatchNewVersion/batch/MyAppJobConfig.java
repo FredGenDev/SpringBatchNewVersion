@@ -92,7 +92,7 @@ public class MyAppJobConfig {
 
     String getFormatedDate(){
         LocalDateTime ldt = LocalDateTime.now();
-        return DateTimeFormatter.ofPattern("MM-dd-yyyy").format(ldt);
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy_hhmmss").format(ldt);
     }
 }
 
