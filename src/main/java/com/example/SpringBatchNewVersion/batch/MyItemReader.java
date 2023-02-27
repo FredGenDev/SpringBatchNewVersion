@@ -23,11 +23,11 @@ public class MyItemReader implements ItemReader<MyAppItem> {
 //        return new JdbcCursorItemReaderBuilder<MyAppItem>()
 //                .name("cursorItemReader")
 //                .dataSource(dataSource)
-//                .sql("SELECT * FROM MY_APP_ITEM ORDER BY ID;")
+//                .sql("SELECT id, name, value_long1, value_long2, value_str FROM MY_APP_ITEM ORDER BY ID;")
 //                .rowMapper(new BeanPropertyRowMapper<>(MyAppItem.class))
 //                .build();
-
-
+//
+//
         myAppItem.setName("in5");
         myAppItem.setValueLong1(5L);
         myAppItem.setValueLong2(5L);

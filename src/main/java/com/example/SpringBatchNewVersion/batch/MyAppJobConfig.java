@@ -45,6 +45,7 @@ public class MyAppJobConfig {
 
     private String jobName = "MyJob" + getFormatedDate();
 
+    // STEP
     @Bean
     public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("StepName2", jobRepository)
@@ -55,10 +56,18 @@ public class MyAppJobConfig {
                 .build();
     }
 
+    // READER
+    @Bean
     public ItemReader<MyAppItem> reader(){
-        return new MyItemReader();
+        return new JdbcCursorItemReaderBuilder<MyAppItem>()
+                .name("cursorItemReader")
+                .dataSource(dataSource)
+                .sql("SELECT name, value_long1, value_long2, value_str FROM MY_APP_ITEM ORDER BY ID;")
+                .rowMapper(new BeanPropertyRowMapper<>(MyAppItem.class))
+                .build();
     }
 
+    // WRITER
     @Bean
     public FlatFileItemWriter<Object> writer() {
         System.out.println("Writer");
@@ -69,22 +78,13 @@ public class MyAppJobConfig {
                 .build();
     }
 
+    // PROCESSOR
     @Bean
     public ItemProcessor<MyAppItem, String> processor(){
         return new MyAppItemProcessor();
     }
 
-    // READER
-//    @Bean
-//    public ItemReader<MyAppItem> reader(){
-//        return new JdbcCursorItemReaderBuilder<MyAppItem>()
-//                .name("cursorItemReader")
-//                .dataSource(dataSource)
-//                .sql("SELECT * FROM MY_APP_ITEM ORDER BY ID;")
-//                .rowMapper(new BeanPropertyRowMapper<>(MyAppItem.class))
-//                .build();
-//    }
-
+    // JOB
     @Bean
     public Job runJob() {
         return new JobBuilder(this.jobName, jobRepository)
